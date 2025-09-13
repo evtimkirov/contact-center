@@ -1,0 +1,74 @@
+services:
+  contact-center-backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    image: contact-center-backend:dev
+    container_name: contact-center-backend
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - ./backend:/var/www/html:cached
+    environment:
+      - APP_ENV=local
+      - APP_DEBUG=true
+      - DB_HOST=contact-center-mysql
+      - DB_PORT=3306
+      - DB_DATABASE=contact_center
+      - DB_USERNAME=contact
+      - DB_PASSWORD=secret
+      - CACHE_DRIVER=redis
+      - SESSION_DRIVER=redis
+      - REDIS_HOST=contact-center-redis
+      - SANCTUM_STATEFUL_DOMAINS=localhost:3000,host.docker.internal:3000
+      - SESSION_DOMAIN=localhost
+    depends_on:
+      - contact-center-mysql
+      - contact-center-redis
+    ports:
+      - "8080:80"
+
+  contact-center-frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    image: contact-center-frontend:dev
+    container_name: contact-center-frontend
+    restart: unless-stopped
+    working_dir: /usr/src/app
+    volumes:
+      - ./frontend:/usr/src/app
+      - /usr/src/app/node_modules
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    ports:
+      - "3000:3000"
+    depends_on:
+      - contact-center-backend
+
+  contact-center-mysql:
+    image: mysql:8.0
+    container_name: contact-center-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootsecret
+      MYSQL_DATABASE: contact_center
+      MYSQL_USER: contact
+      MYSQL_PASSWORD: secret
+    volumes:
+      - dbdata:/var/lib/mysql
+    ports:
+      - "3307:3306"
+
+  contact-center-redis:
+    image: redis:7
+    container_name: contact-center-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
+
+volumes:
+  dbdata:
+  redisdata:
