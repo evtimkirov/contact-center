@@ -21,14 +21,22 @@ COPY vhost.conf /etc/apache2/sites-available/000-default.conf
 
 WORKDIR /var/www/html
 
-# copy only composer files first (cache layer)
+# Copy only composer files first (cache layer)
 COPY composer.json composer.lock ./
 RUN composer install --no-interaction --no-scripts --prefer-dist || true
 
-# copy app code
+# Copy app code
 COPY . /var/www/html
 
 RUN composer install --no-interaction --prefer-dist
 
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+
+# Register the entrypoint
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+ENTRYPOINT ["entrypoint.sh"]
+CMD ["apache2-foreground"]
