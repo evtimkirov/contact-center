@@ -1,6 +1,7 @@
 {
     "require": {
         "fakerphp/faker": "^1.24",
-        "fruitcake/laravel-cors": "^3.0.0"
+        "fruitcake/laravel-cors": "^3.0.0",
+        "laravel/tinker": "^2.10"
     }
 }
