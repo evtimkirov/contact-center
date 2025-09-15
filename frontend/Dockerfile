@@ -1,11 +1,13 @@
-FROM node:18
+FROM node:20
 
 WORKDIR /usr/src/app
 
-COPY package*.json ./
+COPY package.json package-lock.json ./
 RUN npm install
 
-COPY . ./
+COPY . .
 
-EXPOSE 3000
-CMD ["npm", "run", "start"]
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+ENTRYPOINT ["entrypoint.sh"]
