@@ -1,8 +1,9 @@
 <?php
 namespace App\Http\Controllers\Api\V1;
 
+use App\Http\Requests\StoreContactValidation;
+use App\Http\Requests\UpdateContactValidation;
 use App\Models\Contact;
-use Illuminate\Http\Request;
 
 class ContactController
 {
@@ -30,36 +31,26 @@ class ContactController
     /**
      * Create a new contact
      *
-     * @param Request $request
+     * @param StoreContactValidation $request
      * @return mixed
      */
-    public function store(Request $request)
+    public function store(StoreContactValidation $request): mixed
     {
-        $data = $request->validate([
-            'name' => 'required',
-            'email' => 'required|email',
-        ]);
-
-        return Contact::create($data);
+        return Contact::create($request->all());
     }
 
     /**
      * Update contact
      *
-     * @param Request $request
+     * @param UpdateContactValidation $request
      * @param $id
      * @return mixed
      */
-    public function update(Request $request, $id)
+    public function update(UpdateContactValidation $request, $id): mixed
     {
         $contact = Contact::findOrFail($id);
 
-        $data = $request->validate([
-            'name' => 'sometimes|required',
-            'email' => 'sometimes|required|email',
-        ]);
-
-        $contact->update($data);
+        $contact->update($request->all());
 
         return $contact;
     }
