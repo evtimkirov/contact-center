@@ -19,4 +19,16 @@ class Interaction extends Model
         'timestamp',
         'note',
     ];
+
+
+    /**
+     * Change all the columns with dates - created_at, updated_at, etc.
+     *
+     * @param \DateTimeInterface $date
+     * @return string
+     */
+    protected function serializeDate(\DateTimeInterface $date): string
+    {
+        return $date->format('Y-m-d H:i:s');
+    }
 }
