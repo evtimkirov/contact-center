@@ -5,31 +5,39 @@ use App\Http\Requests\StoreContactValidation;
 use App\Http\Requests\UpdateContactValidation;
 use App\Models\Contact;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Cache;
 
 class ContactController
 {
     /**
      * Get contacts
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function index(): JsonResponse
     {
-        return Response::json(['contacts' => Contact::all()]);
+        $contacts = Cache::remember('contacts.all', 60, function () {
+            return Contact::all();
+        });
+
+        return response()->json(['contacts' => $contacts]);
     }
 
     /**
      * Contact details with the interactions
      *
      * @param $id
-     * @return Contact|\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Model|null
+     * @return JsonResponse
      */
-    public function show($id)
+    public function show($id): JsonResponse
     {
-        return Contact::with(['interactions' => function ($query) {
-            $query->orderBy('id', 'desc');
-        }])->findOrFail($id);
+        $contact = Cache::remember("contacts.$id", 60, function () use ($id) {
+            return Contact::with(['interactions' => function ($query) {
+                $query->orderBy('id', 'desc');
+            }])->findOrFail($id);
+        });
+
+        return response()->json($contact);
     }
 
     /**
@@ -40,7 +48,11 @@ class ContactController
      */
     public function store(StoreContactValidation $request): mixed
     {
-        return Contact::create($request->all());
+        $contact = Contact::create($request->all());
+
+        Cache::forget('contacts.all');
+
+        return $contact;
     }
 
     /**
@@ -53,8 +65,10 @@ class ContactController
     public function update(UpdateContactValidation $request, $id): mixed
     {
         $contact = Contact::findOrFail($id);
-
         $contact->update($request->all());
+
+        Cache::forget('contacts.all');
+        Cache::forget("contacts.$id");
 
         return $contact;
     }
@@ -69,6 +83,9 @@ class ContactController
     {
         $contact = Contact::findOrFail($id);
         $contact->delete();
+
+        Cache::forget('contacts.all');
+        Cache::forget("contacts.$id");
 
         return response()->noContent();
     }
