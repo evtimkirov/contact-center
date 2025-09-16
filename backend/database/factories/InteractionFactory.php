@@ -20,6 +20,7 @@ class InteractionFactory extends Factory
         return [
             'contact_id' => Contact::all()->random()->id,
             'type' => $this->faker->randomElement(['active', 'inactive']),
+            'timestamp' => $this->faker->unixTime(),
             'note' => $this->faker->realText(),
         ];
     }
