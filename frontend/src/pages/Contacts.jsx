@@ -13,7 +13,6 @@ export default function Contacts() {
                 setLoading(false);
             })
             .catch(err => {
-                console.error(err);
                 setError("Failed to load contacts.");
                 setLoading(false);
             });
@@ -25,11 +24,41 @@ export default function Contacts() {
     return (
         <div>
             <h2>Contacts</h2>
-            {contacts.length ? (
-                contacts.map(contact => <div key={contact.id}>{contact.name}</div>)
-            ) : (
-                <p>No contacts found.</p>
-            )}
+            <table className="table table-striped">
+                <thead>
+                    <tr>
+                        <td>Name</td>
+                        <td>Email</td>
+                        <td>Created at</td>
+                        <td>Updated at</td>
+                        <td>Actions</td>
+                    </tr>
+                </thead>
+                <tbody>
+                {contacts.length ? (
+                    contacts.map(function(contact) {
+                        return (
+                            <tr key={contact.id}>
+                                <td>{contact.name}</td>
+                                <td>{contact.email}</td>
+                                <td>{contact.created_at}</td>
+                                <td>{contact.updated_at}</td>
+                                <td>
+                                    <button className="btn btn-outline-warning">
+                                        Details
+                                    </button>
+                                    <button className="btn btn-outline-danger ms-2">
+                                        Delete
+                                    </button>
+                                </td>
+                            </tr>
+                        )
+                    })
+                ) : (
+                    <p>No contacts found.</p>
+                )}
+                </tbody>
+            </table>
         </div>
     );
 }

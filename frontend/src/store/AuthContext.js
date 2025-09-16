@@ -10,10 +10,10 @@ export function AuthProvider({ children }) {
 
     useEffect(() => {
         const init = async () => {
-            try {
-                const res = await fetchUser();
-                dispatch(setUser(res.data));
-            } catch {
+            const user = await fetchUser();
+            if (user) {
+                dispatch(setUser(user));
+            } else {
                 dispatch(clearUser());
             }
         };

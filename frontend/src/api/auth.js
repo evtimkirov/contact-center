@@ -6,11 +6,19 @@ export async function login(email, password) {
     return api.post("/login", { email, password });
 }
 
-
 export function logout() {
     return api.post("/logout");
 }
 
-export function fetchUser() {
-    return api.get("/user");
+export async function fetchUser() {
+    try {
+        const res = await api.get("/user");
+
+        return res.data;
+    } catch (err) {
+        if (err.response && err.response.status === 401) {
+            return null;
+        }
+        throw err;
+    }
 }

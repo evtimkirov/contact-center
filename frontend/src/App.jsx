@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import {BrowserRouter, Routes, Route, Navigate} from "react-router-dom";
 import { AuthProvider, useAuth } from "./store/AuthContext";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
@@ -7,27 +7,23 @@ import Contacts from "./pages/Contacts";
 import Navbar from "./components/Navbar";
 
 function AppContent() {
-    const { state } = useAuth();
+    const { state, logout } = useAuth();
 
     return (
         <>
-            <Navbar />
+            {state.user && <Navbar user={state} onLogout={logout} />}
             <div className="container mt-4">
-                <BrowserRouter>
-                    <Routes>
-                        {state.user ? (
-                            <>
-                                <Route path="/" element={<Home />} />
-                                <Route path="/contacts" element={<Contacts />} />
-                                <Route path="*" element={<Navigate to="/" />} />
-                            </>
-                        ) : (
-                            <>
-                                <Route path="*" element={<Login />} />
-                            </>
-                        )}
-                    </Routes>
-                </BrowserRouter>
+                <Routes>
+                    {state.user ? (
+                        <>
+                            <Route path="/" element={<Home />} />
+                            <Route path="/contacts" element={<Contacts />} />
+                            <Route path="*" element={<Navigate to="/" />} />
+                        </>
+                    ) : (
+                        <Route path="*" element={<Login />} />
+                    )}
+                </Routes>
             </div>
         </>
     );
@@ -36,7 +32,9 @@ function AppContent() {
 function App() {
     return (
         <AuthProvider>
-            <AppContent />
+            <BrowserRouter>
+                <AppContent />
+            </BrowserRouter>
         </AuthProvider>
     );
 }
