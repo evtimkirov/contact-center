@@ -4,17 +4,19 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Requests\StoreContactValidation;
 use App\Http\Requests\UpdateContactValidation;
 use App\Models\Contact;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Response;
 
 class ContactController
 {
     /**
      * Get contacts
      *
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function index()
+    public function index(): JsonResponse
     {
-        return Contact::all();
+        return Response::json(['contacts' => Contact::all()]);
     }
 
     /**

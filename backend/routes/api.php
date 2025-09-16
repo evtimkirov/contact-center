@@ -10,6 +10,7 @@ Route::prefix('v1')->group(function () {
 
     // Sanctum protected
     Route::middleware('auth:sanctum')->group(function () {
+        // Auth part
         Route::post('/logout', [AuthController::class, 'logout']);
         Route::get('/user', [AuthController::class, 'currentUser']);
 

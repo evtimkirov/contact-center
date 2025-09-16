@@ -9,7 +9,7 @@ export default function Contacts() {
     useEffect(() => {
         getContacts()
             .then(res => {
-                setContacts(res.data);
+                setContacts(res.data.contacts);
                 setLoading(false);
             })
             .catch(err => {
