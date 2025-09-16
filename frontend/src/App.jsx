@@ -5,6 +5,7 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Contacts from "./pages/Contacts";
 import Navbar from "./components/Navbar";
+import ContactDetails from "./pages/ContactDetails";
 
 function AppContent() {
     const { state, logout } = useAuth();
@@ -18,6 +19,7 @@ function AppContent() {
                         <>
                             <Route path="/" element={<Home />} />
                             <Route path="/contacts" element={<Contacts />} />
+                            <Route path="/contacts/:id" element={<ContactDetails />} />
                             <Route path="*" element={<Navigate to="/" />} />
                         </>
                     ) : (

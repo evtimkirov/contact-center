@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { getContacts } from "../api/contacts";
 import SearchSort from "../components/SearchSort";
 import Pagination from "../components/Pagination";
+import {Link} from "react-router-dom";
 
 export default function Contacts() {
     const [contacts, setContacts] = useState([]);
@@ -84,7 +85,9 @@ export default function Contacts() {
                             <td>{contact.created_at}</td>
                             <td>{contact.updated_at}</td>
                             <td>
-                                <button className="btn btn-outline-warning">Details</button>
+                                <Link to={`/contacts/${contact.id}`} className="btn btn-outline-info">
+                                    Details
+                                </Link>
                                 <button className="btn btn-outline-danger ms-2">Delete</button>
                             </td>
                         </tr>
