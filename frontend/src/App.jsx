@@ -1,22 +1,43 @@
-import React, { useState } from 'react';
-import Home from './pages/Home';
-import Login from './pages/Login';
-import Navbar from './components/Navbar';
+import React from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider, useAuth } from "./store/AuthContext";
+import Home from "./pages/Home";
+import Login from "./pages/Login";
+import Contacts from "./pages/Contacts";
+import Navbar from "./components/Navbar";
 
-function App() {
-    const [user, setUser] = useState(null);
+function AppContent() {
+    const { state } = useAuth();
 
     return (
         <>
-            <Navbar user={user} onLogout={() => setUser(null)} />
+            <Navbar />
             <div className="container mt-4">
-                {!user ? (
-                    <Login onLogin={(u) => setUser(u)} />
-                ) : (
-                    <Home user={user} onLogout={() => setUser(null)} />
-                )}
+                <BrowserRouter>
+                    <Routes>
+                        {state.user ? (
+                            <>
+                                <Route path="/" element={<Home />} />
+                                <Route path="/contacts" element={<Contacts />} />
+                                <Route path="*" element={<Navigate to="/" />} />
+                            </>
+                        ) : (
+                            <>
+                                <Route path="*" element={<Login />} />
+                            </>
+                        )}
+                    </Routes>
+                </BrowserRouter>
             </div>
         </>
+    );
+}
+
+function App() {
+    return (
+        <AuthProvider>
+            <AppContent />
+        </AuthProvider>
     );
 }
 
