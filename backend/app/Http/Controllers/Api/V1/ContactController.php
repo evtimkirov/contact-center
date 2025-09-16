@@ -27,7 +27,9 @@ class ContactController
      */
     public function show($id)
     {
-        return Contact::with('interactions')->findOrFail($id);
+        return Contact::with(['interactions' => function ($query) {
+            $query->orderBy('id', 'desc');
+        }])->findOrFail($id);
     }
 
     /**
