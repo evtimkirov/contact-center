@@ -33,7 +33,7 @@ class UpdateContactValidation extends FormRequest
                 'string',
                 'email:rfc,dns',
                 'max:150',
-                'unique:contacts,email,' . $this->route('id'),
+                'unique:contacts,email,' . $this->route('contact'),
             ],
             'phone' => [
                 'sometimes',
