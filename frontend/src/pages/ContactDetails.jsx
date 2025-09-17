@@ -1,40 +1,130 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { getContactDetails } from "../api/contacts";
+import { useDispatch, useSelector } from "react-redux";
+import { getContact, editContact } from "../store/slices/contactsSlice";
 
 export default function ContactDetails() {
     const { id } = useParams();
-    const [contact, setContact] = useState(null);
+    const dispatch = useDispatch();
+
+    const contactFromStore = useSelector(state =>
+        state.contacts.items.find(contact => contact.id === parseInt(id))
+    );
+
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const [form, setForm] = useState({
+        name: "",
+        email: "",
+        phone: "",
+        company: "",
+    });
+    const [successMessage, setSuccessMessage] = useState("");
+    const [errorMessage, setErrorMessage] = useState("");
 
     useEffect(() => {
-        getContactDetails(id)
+        setLoading(true);
+        dispatch(getContact(id))
+            .unwrap()
             .then(res => {
-                setContact(res.data);
+                setForm({
+                    name: res.name,
+                    email: res.email,
+                    phone: res.phone,
+                    company: res.company,
+                });
                 setLoading(false);
             })
-            .catch(err => {
-                setError("Failed to load contact details.");
+            .catch(() => {
+                setErrorMessage("Failed to load contact details.");
                 setLoading(false);
             });
-    }, [id]);
+    }, [dispatch, id]);
+
+    const handleChange = e => {
+        setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
+    };
+
+    const handleSave = () => {
+        setSuccessMessage("");
+        setErrorMessage("");
+        dispatch(editContact({ id, data: form }))
+            .unwrap()
+            .then(updatedContact => {
+                setSuccessMessage("Contact saved successfully!");
+                setForm({
+                    name: updatedContact.name,
+                    email: updatedContact.email,
+                    phone: updatedContact.phone,
+                    company: updatedContact.company,
+                });
+            })
+            .catch(() => {
+                setErrorMessage("Failed to save contact.");
+            });
+    };
 
     if (loading) return <p>Loading...</p>;
-    if (error) return <p>{error}</p>;
-    if (!contact) return <p>Contact not found</p>;
+    if (!contactFromStore) return <p>Contact not found</p>;
+
+    const interactions = contactFromStore?.interactions || [];
 
     return (
         <div>
-            <h2>{contact.name}</h2>
-            <p>Email: {contact.email}</p>
-            <p>Phone number: {contact.phone}</p>
-            <p>Company name: {contact.company}</p>
-            <p>Created at: {contact.created_at}</p>
-            <p>Updated at: {contact.updated_at}</p>
+            <h2>Contact Details</h2>
 
-            <h3>Interactions</h3>
-            {contact.interactions.length ? (
+            {successMessage && <div className="alert alert-success">{successMessage}</div>}
+            {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
+
+            <div className="mb-3">
+                <label>Name:</label>
+                <input
+                    type="text"
+                    name="name"
+                    value={form.name}
+                    onChange={handleChange}
+                    className="form-control"
+                />
+            </div>
+
+            <div className="mb-3">
+                <label>Email:</label>
+                <input
+                    type="email"
+                    name="email"
+                    value={form.email}
+                    onChange={handleChange}
+                    className="form-control"
+                />
+            </div>
+
+            <div className="mb-3">
+                <label>Phone:</label>
+                <input
+                    type="text"
+                    name="phone"
+                    value={form.phone}
+                    onChange={handleChange}
+                    className="form-control"
+                />
+            </div>
+
+            <div className="mb-3">
+                <label>Company:</label>
+                <input
+                    type="text"
+                    name="company"
+                    value={form.company}
+                    onChange={handleChange}
+                    className="form-control"
+                />
+            </div>
+
+            <button className="btn btn-success" onClick={handleSave}>
+                Save
+            </button>
+
+            <h3 className="mt-4">Interactions</h3>
+            {interactions.length ? (
                 <table className="table table-striped">
                     <thead>
                     <tr>
@@ -44,19 +134,17 @@ export default function ContactDetails() {
                     </tr>
                     </thead>
                     <tbody>
-                    {contact.interactions.map(interaction => (
+                    {interactions.map(interaction => (
                         <tr key={interaction.id}>
                             <td>{interaction.timestamp}</td>
                             <td>
-                                {
-                                    interaction.type === 'inactive' ?
-                                        <span className="badge bg-danger">Inactive</span> :
-                                        <span className="badge bg-success">Active</span>
-                                }
+                                {interaction.type === "inactive" ? (
+                                    <span className="badge bg-danger">Inactive</span>
+                                ) : (
+                                    <span className="badge bg-success">Active</span>
+                                )}
                             </td>
-                            <td  className="font-monospace">
-                                {interaction.note}
-                            </td>
+                            <td className="font-monospace">{interaction.note}</td>
                         </tr>
                     ))}
                     </tbody>
