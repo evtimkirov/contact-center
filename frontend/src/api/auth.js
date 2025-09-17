@@ -1,7 +1,8 @@
 import api from "./axios";
+import authApi from "./authAxios";
 
 export async function login(email, password) {
-    await api.get("/sanctum/csrf-cookie");
+    await authApi.get("/sanctum/csrf-cookie");
 
     return api.post("/login", { email, password });
 }

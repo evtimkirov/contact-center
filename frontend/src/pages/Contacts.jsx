@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { getContacts } from "../api/contacts";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchContacts, removeContact } from "../store/slices/contactsSlice";
 import SearchSort from "../components/SearchSort";
 import Pagination from "../components/Pagination";
 import {Link} from "react-router-dom";
 
 export default function Contacts() {
-    const [contacts, setContacts] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const dispatch = useDispatch();
+    const { items, loading, error } = useSelector(state => state.contacts);
+
     const [currentPage, setCurrentPage] = useState(1);
     const contactsPerPage = 5;
     const [sortField, setSortField] = useState("name");
@@ -15,22 +16,14 @@ export default function Contacts() {
     const [search, setSearch] = useState("");
 
     useEffect(() => {
-        getContacts()
-            .then(res => {
-                setContacts(res.data.contacts);
-                setLoading(false);
-            })
-            .catch(() => {
-                setError("Failed to load contacts.");
-                setLoading(false);
-            });
-    }, []);
+        dispatch(fetchContacts());
+    }, [dispatch]);
 
     if (loading) return <p>Loading contacts...</p>;
     if (error) return <p>{error}</p>;
 
     // Search filter
-    let filteredContacts = contacts.filter(contact =>
+    let filteredContacts = items.filter(contact =>
         contact.name.toLowerCase().includes(search.toLowerCase())
     );
 
@@ -55,7 +48,7 @@ export default function Contacts() {
 
     return (
         <div>
-            <h2>Contacts list</h2>
+            <h2>Contacts</h2>
             <SearchSort
                 search={search}
                 setSearch={setSearch}
@@ -65,7 +58,6 @@ export default function Contacts() {
                 setSortOrder={setSortOrder}
             />
 
-            {/* Contacts list */}
             <table className="table table-striped">
                 <thead>
                 <tr>
@@ -88,12 +80,19 @@ export default function Contacts() {
                                 <Link to={`/contacts/${contact.id}`} className="btn btn-outline-info">
                                     Details
                                 </Link>
-                                <button className="btn btn-outline-danger ms-2">Delete</button>
+                                <button
+                                    className="btn btn-outline-danger ms-2"
+                                    onClick={() => dispatch(removeContact(contact.id))}
+                                >
+                                    Delete
+                                </button>
                             </td>
                         </tr>
                     ))
                 ) : (
-                    <tr><td colSpan="5">No contacts found.</td></tr>
+                    <tr>
+                        <td colSpan="5">No contacts found.</td>
+                    </tr>
                 )}
                 </tbody>
             </table>

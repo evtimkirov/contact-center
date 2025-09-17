@@ -1,21 +1,23 @@
 import React from "react";
-import {BrowserRouter, Routes, Route, Navigate} from "react-router-dom";
-import { AuthProvider, useAuth } from "./store/AuthContext";
+import { Routes, Route, Navigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Contacts from "./pages/Contacts";
-import Navbar from "./components/Navbar";
 import ContactDetails from "./pages/ContactDetails";
+import Navbar from "./components/Navbar";
+import { logoutUser } from "./store/slices/authSlice";
 
 function AppContent() {
-    const { state, logout } = useAuth();
+    const { user } = useSelector((state) => state.auth);
+    const dispatch = useDispatch();
 
     return (
         <>
-            {state.user && <Navbar user={state} onLogout={logout} />}
+            {user && <Navbar user={user} onLogout={() => dispatch(logoutUser())} />}
             <div className="container mt-4">
                 <Routes>
-                    {state.user ? (
+                    {user ? (
                         <>
                             <Route path="/" element={<Home />} />
                             <Route path="/contacts" element={<Contacts />} />
@@ -31,14 +33,4 @@ function AppContent() {
     );
 }
 
-function App() {
-    return (
-        <AuthProvider>
-            <BrowserRouter>
-                <AppContent />
-            </BrowserRouter>
-        </AuthProvider>
-    );
-}
-
-export default App;
+export default AppContent;
