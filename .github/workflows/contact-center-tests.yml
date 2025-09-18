@@ -1,0 +1,89 @@
+name: Contact Center Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  laravel-tests:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: rootsecret
+          MYSQL_DATABASE: contact_center
+          MYSQL_USER: contact
+          MYSQL_PASSWORD: secret
+        ports:
+          - 3307:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd="redis-cli ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.2
+          extensions: mbstring, bcmath, pdo_mysql, tokenizer, redis
+          ini-values: post_max_size=256M, upload_max_filesize=256M
+
+      - name: Install Composer dependencies
+        run: composer install --prefer-dist --no-progress --no-suggest --optimize-autoloader
+
+      - name: Copy .env
+        run: cp backend/.env.example backend/.env
+
+      - name: Generate APP_KEY
+        run: php backend/artisan key:generate
+
+      - name: Wait for MySQL
+        run: |
+          until mysqladmin ping -h 127.0.0.1 -P 3307 --silent; do
+            echo "Waiting for database..."
+            sleep 3
+          done
+
+      - name: Run Migrations
+        working-directory: ./backend
+        env:
+          DB_CONNECTION: mysql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3307
+          DB_DATABASE: contact_center
+          DB_USERNAME: contact
+          DB_PASSWORD: secret
+          CACHE_DRIVER: redis
+          REDIS_HOST: 127.0.0.1
+        run: php artisan migrate --force
+
+      - name: Run Tests
+        working-directory: ./backend
+        env:
+          DB_CONNECTION: mysql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3307
+          DB_DATABASE: contact_center
+          DB_USERNAME: contact
+          DB_PASSWORD: secret
+          CACHE_DRIVER: redis
+          REDIS_HOST: 127.0.0.1
+        run: php artisan test --verbose
