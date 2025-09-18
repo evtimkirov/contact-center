@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect} from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import Home from "./pages/Home";
@@ -6,11 +6,16 @@ import Login from "./pages/Login";
 import Contacts from "./pages/Contacts";
 import ContactDetails from "./pages/ContactDetails";
 import Navbar from "./components/Navbar";
-import { logoutUser } from "./store/slices/authSlice";
+import { logoutUser, getCurrentUser } from "./store/thunks/authThunks";
+import CreateContact from "./pages/CreateContact";
 
 function AppContent() {
     const { user } = useSelector((state) => state.auth);
     const dispatch = useDispatch();
+
+    useEffect(() => {
+        dispatch(getCurrentUser());
+    }, [dispatch]);
 
     return (
         <>
@@ -22,6 +27,7 @@ function AppContent() {
                             <Route path="/" element={<Home />} />
                             <Route path="/contacts" element={<Contacts />} />
                             <Route path="/contacts/:id" element={<ContactDetails />} />
+                            <Route path="/contacts/new" element={<CreateContact />} />
                             <Route path="*" element={<Navigate to="/" />} />
                         </>
                     ) : (

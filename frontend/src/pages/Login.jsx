@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { loginUser } from "../store/slices/authSlice";
+import { loginUser } from "../store/thunks/authThunks";
 
 export default function Login() {
     const [email, setEmail] = useState("");
@@ -10,6 +10,7 @@ export default function Login() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+
         dispatch(loginUser({ email, password }));
     };
 

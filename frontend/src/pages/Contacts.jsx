@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchContacts, removeContact } from "../store/slices/contactsSlice";
+import { fetchContacts, removeContact } from "../store/thunks/contactThunks";
+import { clearMessages } from "../store/slices/contactsSlice";
 import SearchSort from "../components/SearchSort";
 import Pagination from "../components/Pagination";
 import {Link} from "react-router-dom";
 
 export default function Contacts() {
     const dispatch = useDispatch();
-    const { items, loading, error } = useSelector(state => state.contacts);
+    const { items, loading } = useSelector(state => state.contacts);
 
     const [currentPage, setCurrentPage] = useState(1);
     const contactsPerPage = 5;
@@ -17,10 +18,10 @@ export default function Contacts() {
 
     useEffect(() => {
         dispatch(fetchContacts());
+        dispatch(clearMessages());
     }, [dispatch]);
 
     if (loading) return <p>Loading contacts...</p>;
-    if (error) return <p>{error}</p>;
 
     // Search filter
     let filteredContacts = items.filter(contact =>
@@ -82,10 +83,18 @@ export default function Contacts() {
                                 </Link>
                                 <button
                                     className="btn btn-outline-danger ms-2"
-                                    onClick={() => dispatch(removeContact(contact.id))}
+                                    onClick={async () => {
+                                        if (window.confirm("Are you sure you want to delete this contact?")) {
+                                            const resultAction = await dispatch(removeContact(contact.id));
+                                            if (removeContact.fulfilled.match(resultAction)) {
+                                                dispatch(fetchContacts());
+                                            }
+                                        }
+                                    }}
                                 >
                                     Delete
                                 </button>
+
                             </td>
                         </tr>
                     ))
