@@ -47,19 +47,12 @@ jobs:
           coverage: none
 
       - name: Install Composer dependencies
+        working-directory: ./backend
         run: composer install --prefer-dist --no-progress --no-suggest
 
       - name: Copy .env
-        run: cp backend/.env.example backend/.env
-
-      - name: Generate app key
-        run: php backend/artisan key:generate
-
-      - name: Run migrations
-        run: php backend/artisan migrate --force
-
-      - name: Run tests
-        run: php backend/artisan test
+        working-directory: ./backend
+        run: cp .env.example .env
 
       - name: Wait for MySQL
         run: |
@@ -67,6 +60,10 @@ jobs:
             echo "Waiting for database..."
             sleep 3
           done
+
+      - name: Generate app key
+        working-directory: ./backend
+        run: php artisan key:generate
 
       - name: Run Migrations
         working-directory: ./backend
