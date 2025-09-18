@@ -42,18 +42,24 @@ jobs:
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.2
-          extensions: mbstring, bcmath, pdo_mysql, tokenizer, redis
-          ini-values: post_max_size=256M, upload_max_filesize=256M
+          php-version: '8.2'
+          extensions: mbstring, bcmath, pdo_mysql, redis
+          coverage: none
 
       - name: Install Composer dependencies
-        run: composer install --prefer-dist --no-progress --no-suggest --optimize-autoloader
+        run: composer install --prefer-dist --no-progress --no-suggest
 
       - name: Copy .env
         run: cp backend/.env.example backend/.env
 
-      - name: Generate APP_KEY
+      - name: Generate app key
         run: php backend/artisan key:generate
+
+      - name: Run migrations
+        run: php backend/artisan migrate --force
+
+      - name: Run tests
+        run: php backend/artisan test
 
       - name: Wait for MySQL
         run: |
