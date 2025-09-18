@@ -1,16 +1,15 @@
 #!/bin/bash
 set -e
 
-# Copy .env.example to .env
+# Copy .env.example if missing
 if [ ! -f .env ]; then
     cp .env.example .env
-    echo ".env file created from .env.example"
 fi
 
-# Generate the Laravel app key
+# Generate laravel app key
 php artisan key:generate
 
-echo "Clear the old database data and create new ones"
+# Run the migration with seeders
 php artisan migrate:fresh --seed --force
 
 exec "$@"
