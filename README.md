@@ -16,6 +16,9 @@ docker compose up --build
 ## Specifics
 
 * The frontend can be accessed at http://localhost:3001/
+  * Login with 
+    * Email: `admin@squaretalk.com`
+    * Password: `password`
 * The backend (API) can be accessed at http://localhost:8080/
 
 ## Used  technologies
