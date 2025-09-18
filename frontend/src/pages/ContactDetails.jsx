@@ -51,15 +51,15 @@ export default function ContactDetails() {
                         </tr>
                         </thead>
                         <tbody>
-                        {interactions.map(i => (
-                            <tr key={i.id}>
-                                <td>{i.timestamp}</td>
+                        {interactions.map(interaction => (
+                            <tr key={interaction.id}>
+                                <td>{interaction.timestamp}</td>
                                 <td>
-                                    <span className={`badge ${i.type === "inactive" ? "bg-danger" : "bg-success"}`}>
-                                        {i.type === "inactive" ? "Inactive" : "Active"}
+                                    <span className={`badge ${interaction.type === "inactive" ? "bg-danger" : "bg-success"}`}>
+                                        {interaction.type === "inactive" ? "Inactive" : "Active"}
                                     </span>
                                 </td>
-                                <td className="font-monospace">{i.note}</td>
+                                <td className="font-monospace">{interaction.note}</td>
                             </tr>
                         ))}
                         </tbody>

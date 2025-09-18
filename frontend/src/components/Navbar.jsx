@@ -1,11 +1,17 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import {APP_ROUTES} from "../constants/routes";
 
 function Navbar({ user, onLogout }) {
     return (
         <nav className="navbar navbar-expand-lg navbar-light bg-light">
             <div className="container-fluid">
-                <Link className="navbar-brand" to="/">Contact center</Link>
+                <Link
+                    className="navbar-brand"
+                    to={APP_ROUTES.HOME}
+                >
+                    Contact center
+                </Link>
                 <button
                     className="navbar-toggler"
                     type="button"
@@ -34,12 +40,12 @@ function Navbar({ user, onLogout }) {
                                     </a>
                                     <ul className="dropdown-menu" aria-labelledby="contactsDropdown">
                                         <li>
-                                            <Link className="dropdown-item" to="/contacts">
+                                            <Link className="dropdown-item" to={APP_ROUTES.CONTACTS}>
                                                 List
                                             </Link>
                                         </li>
                                         <li>
-                                            <Link className="dropdown-item" to="/contacts/new">
+                                            <Link className="dropdown-item" to={APP_ROUTES.CREATE_CONTACT}>
                                                 New Contact
                                             </Link>
                                         </li>

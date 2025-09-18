@@ -5,6 +5,7 @@ import { clearMessages } from "../store/slices/contactsSlice";
 import SearchSort from "../components/SearchSort";
 import Pagination from "../components/Pagination";
 import {Link} from "react-router-dom";
+import {APP_ROUTES} from "../constants/routes";
 
 export default function Contacts() {
     const dispatch = useDispatch();
@@ -78,7 +79,7 @@ export default function Contacts() {
                             <td>{contact.created_at}</td>
                             <td>{contact.updated_at}</td>
                             <td>
-                                <Link to={`/contacts/${contact.id}`} className="btn btn-outline-info">
+                                <Link to={APP_ROUTES.CONTACT_DETAILS(contact.id)} className="btn btn-outline-info">
                                     Details
                                 </Link>
                                 <button
