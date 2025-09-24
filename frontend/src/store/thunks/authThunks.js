@@ -6,10 +6,11 @@ export const loginUser = createAsyncThunk('auth/loginUser', async ({ email, pass
         await login(email, password);
 
         const user = await fetchUser();
+
         return user;
     } catch (err) {
-        if (err.response && err.response.status === 422) {
-            return rejectWithValue(err.response.data);
+        if (err.response && (err.response.status >= 400 || err.response.status < 500)) {
+            return rejectWithValue('Wrong credentials.');
         }
         throw err;
     }
