@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Requests\StoreContactValidation;
 use App\Http\Requests\UpdateContactValidation;
 use App\Models\Contact;
+use App\Services\ContactCacheService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Redis;
 
 class ContactController
 {
@@ -27,17 +29,12 @@ class ContactController
      * Contact details with the interactions
      *
      * @param $id
+     * @param ContactCacheService $cacheService
      * @return JsonResponse
      */
-    public function show($id): JsonResponse
+    public function show($id, ContactCacheService $cacheService): JsonResponse
     {
-        $contact = Cache::remember("contacts.$id", 60, function () use ($id) {
-            return Contact::with(['interactions' => function ($query) {
-                $query->orderBy('id', 'desc');
-            }])->findOrFail($id);
-        });
-
-        return response()->json($contact);
+        return response()->json($cacheService->getContact($id));
     }
 
     /**
